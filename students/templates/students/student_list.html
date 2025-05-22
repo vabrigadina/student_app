@@ -1,0 +1,73 @@
+{% extends 'students/base.html' %}
+{% block title %}Список студентов{% endblock %}
+{% block content %}
+<h1>Список студентов</h1>
+
+<!-- Фильтры и сортировка -->
+<form method="get">
+    <label>Специализация:</label>
+    <select name="specialization">
+        <option value="">Все</option>
+        {% for value, label in specialization_choices %}
+        <option value="{{ value }}" {% if current_specialization == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Курс:</label>
+    <select name="course">
+        <option value="">Все</option>
+        {% for value, label in course_choices %}
+        <option value="{{ value }}" {% if current_course == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Сортировать по:</label>
+    <select name="sort_by">
+        <option value="full_name" {% if current_sort == 'full_name' %}selected{% endif %}>ФИО</option>
+        <option value="average_grade" {% if current_sort == 'average_grade' %}selected{% endif %}>Средний балл</option>
+        <option value="graduation_year" {% if current_sort == 'graduation_year' %}selected{% endif %}>Год окончания</option>
+    </select>
+    <button type="submit">Применить</button>
+</form>
+
+<!-- Таблица студентов -->
+<table>
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Программа</th>
+            <th>Курс</th>
+            <th>Группа</th>
+            <th>Специализация</th>
+            <th>Год окончания</th>
+            <th>Средний балл</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.full_name }}</td>
+            <td>{{ student.program }}</td>
+            <td>{{ student.course }}</td>
+            <td>{{ student.group_number }}</td>
+            <td>{{ student.get_specialization_display }}</td>
+            <td>{{ student.graduation_year }}</td>
+            <td>{{ student.average_grade }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Нет данных</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Статистика -->
+<h2>Статистика</h2>
+<p>Общее количество студентов: {{ stats.total_students }}</p>
+<p>Средний балл по всем студентам: {{ stats.avg_grade|floatformat:2 }}</p>
+<h3>Распределение по специализациям:</h3>
+<ul>
+    {% for spec in specialization_stats %}
+    <li>{{ spec.specialization }}: {{ spec.count }} </li>
+    {% endfor %}
+</ul>
+{% endblock %}
